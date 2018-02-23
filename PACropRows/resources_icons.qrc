@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="logouv">
+    <file>img/uvlogo.png</file>
+  </qresource>
+  <qresource prefix="logogroup2">
+    <file>img/mmvlab2.jpg</file>
+  </qresource>
+  <qresource prefix="logogroup">
+    <file>img/mmvlab.png</file>
+  </qresource>
+</RCC>
