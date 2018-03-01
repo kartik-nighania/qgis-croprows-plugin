@@ -22,6 +22,7 @@
 """
 import os
 import random
+import time
 import subprocess
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import *
@@ -213,6 +214,7 @@ class PACropRows:
             #layer_list.append(layer.name())
         #self.dlg.vectormask_Box.addItems(layer_list)
 
+        self.dlg.aboutTextBrowser.clear()
         self.dlg.aboutTextBrowser.append("<span>This plugin is part of a master thesis of <b>AN AUTOMATIC CROP ROWS GENERATOR USING AERIAL HIGH-RESOLUTION IMAGES FOR PRECISION AGRICULTURE</b></span>")
         self.dlg.aboutTextBrowser.append("<span>in partial fulfillment of the requirements for the degree of:</span>")
         self.dlg.aboutTextBrowser.append("<span>Magister en Ingenier&iacute;a con &Eacute;nfasis en Ingenier&iacute;a de Sistemas y Computaci&oacute;n</span>")
@@ -236,30 +238,50 @@ class PACropRows:
             maskselected = self.dlg.vectormask_Box.currentText()
 
             if mosaicselected != '' and maskselected != '':
-                print('Processing Raster')
-                urlmosaic = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)[0].dataProvider().dataSourceUri()
-                urlmask = QgsMapLayerRegistry.instance().mapLayersByName(maskselected)[0].dataProvider().dataSourceUri()
-                urlmaskSplit = urlmask.split("|")[0]
+                ret = QMessageBox.question(None, "Crop rows processing start", ("Are you sure that you want to start Crop rows generation process?  Keep in mind this process can take a few minutes, even several hours."),QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                if ret == QMessageBox.Yes:
+                    print('Processing Raster')
+                    urlmosaic = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)[0].dataProvider().dataSourceUri()
+                    urlmask = QgsMapLayerRegistry.instance().mapLayersByName(maskselected)[0].dataProvider().dataSourceUri()
+                    urlmaskSplit = urlmask.split("|")[0]
 
-                tmpfolder = 'C:\\TEMPORAL\\'
-                ouputclipfile = 'clipfile00001.tif'
-                pixelsizexy = '0.0005'
-                #gets ist
-                #urlmosaiklayer = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)
-                print(urlmosaic)
-                print(urlmaskSplit)
-                print('gdal clipper ')
+                    tmpfolder = self.dlg.tmp_path.text().replace("/", "\\")
 
-                #print('C:/Program Files/QGIS 2.14/bin/gdalwarp')
-                gdalwarpcommand = '"C:\\Program Files\\QGIS 2.14\\bin\\gdalwarp.exe" -dstnodata -9999 -q -cutline '+urlmaskSplit+' -tr '+pixelsizexy+' '+pixelsizexy+' -of GTiff '+urlmosaic+' ' + tmpfolder + ouputclipfile
 
-                print(gdalwarpcommand)
+                    rasterLyr = QgsRasterLayer(urlmosaic, "masklayer")
+                    pixelsizex = rasterLyr.rasterUnitsPerPixelX()
+                    pixelsizey = rasterLyr.rasterUnitsPerPixelY()
 
-                p = subprocess.Popen('dir', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                for line in p.stdout.readlines():
-                    print (line),
-                    retval = p.wait()
-                pass
+                    self.dlg.xmosaic.setText(str(pixelsizex))
+                    self.dlg.ymosaic.setText(str(pixelsizey))
+                    #gets ist
+                    #urlmosaiklayer = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)
+                    print(urlmosaic)
+                    print(urlmaskSplit)
+                    print('gdal clipper ')
+                    print(pixelsizex)
+                    print(pixelsizey)
 
+                    gdalosgeopath = self.dlg.gdalosgeo_path.text().replace("/", "\\")
+                    tmppath = self.dlg.tmp_path.text().replace("/", "\\")
+
+                    timestr = time.strftime("%Y%m%d-%H%M%S")
+                    ouputclipfile = 'clipfile_'+timestr+'.tif'
+                    ouputclipfile_path=tmpfolder.replace("/", "\\") + ouputclipfile
+
+                    #print('C:/Program Files/QGIS 2.14/bin/gdalwarp')
+                    gdalwarpcommand = gdalosgeopath+"\\"+'gdalwarp.exe -dstnodata -9999 -q -cutline '+urlmaskSplit.replace("/", "\\")+' -crop_to_cutline -tr '+str(pixelsizex)+' '+str(pixelsizex)+' -of GTiff '+urlmosaic.replace("/", "\\")+' ' + ouputclipfile_path
+
+                    print(gdalwarpcommand)
+
+                    p = subprocess.Popen(gdalwarpcommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    for line in p.stdout.readlines():
+                        print (line),
+                        retval = p.wait()
+                    print('Clipper process done check result file ' + ouputclipfile_path )
+                    #Load result file into map environment
+                    layerclipped = QgsRasterLayer(ouputclipfile_path, ouputclipfile[:-4])
+                    QgsMapLayerRegistry.instance().addMapLayer(layerclipped)
+                    pass
             else:
                 print('Incomplete Prameters')
