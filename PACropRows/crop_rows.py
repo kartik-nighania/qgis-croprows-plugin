@@ -20,9 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os
+import random
+import subprocess
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import *
+from PyQt4.QtGui import QMessageBox
 from qgis.core import *
+from qgis.core import QgsProject
 from qgis.gui import *
 #from qgis.core import QgsMapLayer, QgsMapLayerRegistry
 #from qgis.gui import QgsMapLayerComboBox, QgsMapLayerProxyModel, QgsFieldComboBox
@@ -142,7 +147,7 @@ class PACropRows:
         # Create the dialog (after translation) and keep reference
         self.dlg = PACropRowsDialog()
         icon_path = ':/plugins/PACropRows/icon.png'
-		
+
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -187,6 +192,8 @@ class PACropRows:
         # remove the toolbar
         del self.toolbar
 
+    def isNotEmpty(s):
+        return bool(s and s.strip())
 
     def run(self):
         """Run method that performs all the real work"""
@@ -194,7 +201,7 @@ class PACropRows:
         ## Load layers and add to comboboxes
         #layers = self.iface.legendInterface().layers()
         layers = QgsMapLayerRegistry.instance().mapLayers().values()
-        #Clear combobox 
+        #Clear combobox
         self.dlg.vectormask_Box.clear()
         self.dlg.rastermosaic_Box.clear()
         #layer_list = []
@@ -217,4 +224,42 @@ class PACropRows:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+
+            #print(layers)
+            #path_absolute = QgsProject.instance().readPath("./")
+            #QMessageBox.information(None, "Title", "AP: " + unicode(path_absolute))
+
+            ##gets only the active layer
+            ##myfilepath= self.iface.activeLayer().dataProvider().dataSourceUri()
+            ##print(myfilepath)
+            mosaicselected = self.dlg.rastermosaic_Box.currentText()
+            maskselected = self.dlg.vectormask_Box.currentText()
+
+            if mosaicselected != '' and maskselected != '':
+                print('Processing Raster')
+                urlmosaic = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)[0].dataProvider().dataSourceUri()
+                urlmask = QgsMapLayerRegistry.instance().mapLayersByName(maskselected)[0].dataProvider().dataSourceUri()
+                urlmaskSplit = urlmask.split("|")[0]
+
+                tmpfolder = 'C:\\TEMPORAL\\'
+                ouputclipfile = 'clipfile00001.tif'
+                pixelsizexy = '0.0005'
+                #gets ist
+                #urlmosaiklayer = QgsMapLayerRegistry.instance().mapLayersByName(mosaicselected)
+                print(urlmosaic)
+                print(urlmaskSplit)
+                print('gdal clipper ')
+
+                #print('C:/Program Files/QGIS 2.14/bin/gdalwarp')
+                gdalwarpcommand = '"C:\\Program Files\\QGIS 2.14\\bin\\gdalwarp.exe" -dstnodata -9999 -q -cutline '+urlmaskSplit+' -tr '+pixelsizexy+' '+pixelsizexy+' -of GTiff '+urlmosaic+' ' + tmpfolder + ouputclipfile
+
+                print(gdalwarpcommand)
+
+                p = subprocess.Popen('dir', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in p.stdout.readlines():
+                    print (line),
+                    retval = p.wait()
+                pass
+
+            else:
+                print('Incomplete Prameters')

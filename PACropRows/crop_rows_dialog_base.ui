@@ -35,7 +35,7 @@
        <x>10</x>
        <y>10</y>
        <width>431</width>
-       <height>151</height>
+       <height>171</height>
       </rect>
      </property>
      <property name="title">
@@ -47,7 +47,7 @@
         <x>10</x>
         <y>30</y>
         <width>411</width>
-        <height>109</height>
+        <height>132</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
@@ -61,23 +61,30 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QComboBox" name="rastermosaic_Box"/>
-       </item>
        <item row="4" column="0">
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="only_selected_check">
          <property name="text">
-          <string>Only selected feature</string>
+          <string>Masking with only selected feature</string>
          </property>
         </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QComboBox" name="vectormask_Box"/>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Mosaic Image Layer:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QComboBox" name="rastermosaic_Box"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QComboBox" name="vectormask_Box"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="load_clipped_check">
+         <property name="text">
+          <string>Load clipped raster into canvas when finished</string>
          </property>
         </widget>
        </item>
@@ -104,7 +111,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
+       <y>190</y>
        <width>431</width>
        <height>131</height>
       </rect>
@@ -164,14 +171,14 @@
          <item>
           <widget class="QCheckBox" name="checkBox_3">
            <property name="text">
-            <string> Load in QGIS when done</string>
+            <string> Load crop rows results into canvas when finished</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QCheckBox" name="checkBox_4">
            <property name="text">
-            <string>Upload to database</string>
+            <string>Quick upload into spatial database</string>
            </property>
           </widget>
          </item>
@@ -184,13 +191,13 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>310</y>
+       <y>320</y>
        <width>431</width>
        <height>141</height>
       </rect>
      </property>
      <property name="title">
-      <string>Processing</string>
+      <string>Processing status</string>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
@@ -247,14 +254,14 @@
       </rect>
      </property>
      <property name="title">
-      <string>Plugin</string>
+      <string>Globals</string>
      </property>
      <widget class="QWidget" name="formLayoutWidget_2">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>401</width>
+        <width>411</width>
         <height>80</height>
        </rect>
       </property>
@@ -276,12 +283,30 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_19">
          <property name="text">
-          <string>GDAL path:</string>
+          <string>GDAL/OSGeo bin path :</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_3"/>
+        <widget class="QLineEdit" name="gdalosgeo_path">
+         <property name="text">
+          <string>C:\OSGeo4W64\bin\</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>TEMP path :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="tmp_path">
+         <property name="text">
+          <string>C:\temporal\</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -290,7 +315,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>300</y>
        <width>431</width>
        <height>141</height>
       </rect>
@@ -301,17 +326,17 @@
      <widget class="QWidget" name="formLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>391</width>
-        <height>97</height>
+        <x>10</x>
+        <y>20</y>
+        <width>411</width>
+        <height>111</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Server:</string>
+          <string>Server :</string>
          </property>
         </widget>
        </item>
@@ -321,7 +346,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Username:</string>
+          <string>Username :</string>
          </property>
         </widget>
        </item>
@@ -331,7 +356,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Password:</string>
+          <string>Password :</string>
          </property>
         </widget>
        </item>
@@ -341,9 +366,79 @@
        <item row="3" column="0">
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
-          <string>keep password</string>
+          <string>Keep password</string>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>431</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Raster</string>
+     </property>
+     <widget class="QWidget" name="formLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>19</y>
+        <width>411</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <layout class="QFormLayout" name="formLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string>No data value :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="nodatavalue">
+         <property name="text">
+          <string>-999</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
+          <string>Pixel size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>x: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="xmosaic"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>y :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="ymosaic"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
